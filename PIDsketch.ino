@@ -10,10 +10,10 @@ double previousError = 0;
 double P = 0;
 double I = 0;
 double D = 0;
-double val = 0.0001;
+double val = 0;
 
 void setup() {
-  PIDController(0.01,0.2,0.01);
+  PIDController(0.0912,0.0002,0.001);
   Serial.begin(115200);
   Serial.println("Starting");
 }
@@ -42,7 +42,7 @@ double calculate(double actual) {
     error = (setPoint - actual);
     integral += (error * timeInterval);
     derivative = (error - previousError) / timeInterval;
-    retVal = (P * error);
+    retVal = (P * error) + (I * integral) + (D * derivative);
     previousError = error;
     previousTime = time;
   }
@@ -50,7 +50,12 @@ double calculate(double actual) {
   return(retVal);
 }
 
+void readSer() {
+  if(Serial.available() > 0){
+    val = Serial.read();
+  }
+}
+
 void loop() {
-  val += calculate(val);
-  Serial.println(val);
+  Serial.println(calculate(val));
 }
